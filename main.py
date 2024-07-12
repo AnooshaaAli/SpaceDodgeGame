@@ -1,0 +1,6 @@
+import pygame
+import time
+import random
+
+WIDTH, HEIGHT = 1000, 800
+WIN = pygame.display.set_mode(WIDTH, HEIGHT)
