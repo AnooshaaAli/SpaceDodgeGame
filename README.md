@@ -6,6 +6,7 @@ This is a simple Pygame program that demonstrates how to capture the current sta
 
 - Python 3.x
 - Pygame
+- VS Code
 
 ## Installation
 
