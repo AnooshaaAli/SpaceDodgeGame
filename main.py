@@ -13,13 +13,23 @@ PLAYER_WIDTH = 20
 PLAYER_HEIGHT = 30
 PLAYER_VEL = 5
 
+STAR_WIDTH = 5
+STAR_HEIGHT = 10
+STAR_VEL = 5
+
 FONT = pygame.font.SysFont("comicsans", 15)
 
-def draw(player, elapsed_time):
+def draw(player, elapsed_time, stars):
     WIN.blit(BG, (0, 0))
-    pygame.draw.rect(WIN, (255, 0, 0), player)
+    
     time_text = FONT.render(f"Time: {round(elapsed_time)}s", 1, "yellow")
     WIN.blit(time_text, (10, 10))
+    
+    pygame.draw.rect(WIN, (255, 0, 0), player)
+    
+    for star in stars:
+        pygame.draw.rect(WIN, "white", star)
+        
     pygame.display.update()
     
 def main():
@@ -27,14 +37,30 @@ def main():
     
     player = pygame.Rect(100, HEIGHT - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT)
     
+    # Time variables
     clock = pygame.time.Clock()
     start_time = time.time()
     elapsed_time = 0
     
+    # Projectile variables
+    star_add_increment = 2000
+    star_count = 0
+    stars = []  
+    hit = False
+    
     while run:
-        clock.tick(60)
+        star_count += clock.tick(60)     # It will return the  number of milliseconds since the last clock tick
         elapsed_time = time.time() - start_time
         
+        if star_count > star_add_increment:
+            for _ in range(3):
+                star_x = random.randint(0, WIDTH - STAR_WIDTH)
+                star = pygame.Rect(star_x, -STAR_HEIGHT, STAR_WIDTH, STAR_HEIGHT)
+                stars.append(star)
+                
+            star_add_increment = max(200, star_add_increment - 50)
+            star_count = 0
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -54,7 +80,16 @@ def main():
         if keys[pygame.K_DOWN] and player.y + PLAYER_VEL + player.height <= HEIGHT:
             player.y += PLAYER_VEL
             
-        draw(player, elapsed_time)
+        for star in stars[:]:
+            star.y += STAR_VEL
+            if star.y > HEIGHT:
+                stars.remove(star)
+            elif star.y >= player.y and star.colliderect(player):
+                stars.remove(star)
+                hit = True
+                break
+            
+        draw(player, elapsed_time, stars)
         
     pygame.quit()
     
